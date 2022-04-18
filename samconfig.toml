@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "topfanslite"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1mwa7p5x8ix35"
+s3_prefix = "topfanslite"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+parameter_overrides = "StageName=\"Prod\""
