@@ -1,0 +1,144 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: feeds
+Transform:
+- AWS::Serverless-2016-10-31
+Parameters:
+  StageName:
+    Type: String
+    Default: Prod
+Resources:
+  feedsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: feedsFunction
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1mwa7p5x8ix35/f2c96dda7e0b3c931ac03ede7197984b
+      Handler: src/handlers/feeds.handler
+      Runtime: nodejs14.x
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A simple example includes a HTTP get method to get all items from
+        a DynamoDB table.
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MyMarketItems
+      Environment:
+        Variables:
+          SAMPLE_TABLE:
+            Ref: MyMarketItems
+      Events:
+        GetAllFeedsApi:
+          Type: HttpApi
+          Properties:
+            Path: /feeds
+            Method: GET
+            ApiId:
+              Ref: HttpApi
+            TimeoutInMillis: 15000
+            PayloadFormatVersion: '2.0'
+            RouteSettings:
+              ThrottlingBurstLimit: 600
+        UpsertFeedsApi:
+          Type: HttpApi
+          Properties:
+            Path: /feeds
+            Method: PUT
+            ApiId:
+              Ref: HttpApi
+            TimeoutInMillis: 15000
+            PayloadFormatVersion: '2.0'
+            RouteSettings:
+              ThrottlingBurstLimit: 600
+    Metadata:
+      SamResourceId: feedsFunction
+  usersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: usersFunction
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1mwa7p5x8ix35/377bb7925f28ed3b29474c44646ea9e4
+      Handler: src/handlers/users.handler
+      Runtime: nodejs14.x
+      Architectures:
+      - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: A simple example includes a HTTP get method to get all items from
+        a DynamoDB table.
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: MyMarketItems
+      Environment:
+        Variables:
+          SAMPLE_TABLE:
+            Ref: MyMarketItems
+      Events:
+        GetAllUsersApi:
+          Type: HttpApi
+          Properties:
+            Path: /users
+            Method: GET
+            ApiId:
+              Ref: HttpApi
+            TimeoutInMillis: 15000
+            PayloadFormatVersion: '2.0'
+            RouteSettings:
+              ThrottlingBurstLimit: 600
+        UpsertUsersApi:
+          Type: HttpApi
+          Properties:
+            Path: /users
+            Method: PUT
+            ApiId:
+              Ref: HttpApi
+            TimeoutInMillis: 15000
+            PayloadFormatVersion: '2.0'
+            RouteSettings:
+              ThrottlingBurstLimit: 600
+    Metadata:
+      SamResourceId: usersFunction
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName:
+        Ref: StageName
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 200
+      RouteSettings:
+        GET /feeds:
+          ThrottlingBurstLimit: 500
+        PUT /feeds:
+          ThrottlingBurstLimit: 500
+        GET /users:
+          ThrottlingBurstLimit: 500
+        PUT /users:
+          ThrottlingBurstLimit: 500
+    Metadata:
+      SamResourceId: HttpApi
+  MyMarketItems:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MyMarketItems
+      AttributeDefinitions:
+      - AttributeName: pk
+        AttributeType: S
+      - AttributeName: sk
+        AttributeType: S
+      KeySchema:
+      - AttributeName: pk
+        KeyType: HASH
+      - AttributeName: sk
+        KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      ProvisionedThroughput:
+        ReadCapacityUnits: 0
+        WriteCapacityUnits: 0
+    Metadata:
+      SamResourceId: MyMarketItems
+Outputs:
+  WebEndpoint:
+    Description: API Gateway endpoint URL for Prod stage
+    Value:
+      Fn::Sub: https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
