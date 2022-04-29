@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
             Item: requestJSON
           })
           .promise();
-        body = `Put user ${requestJSON.pk}`;
+        body = `Put users ${requestJSON.pk}`;
         break;
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`);

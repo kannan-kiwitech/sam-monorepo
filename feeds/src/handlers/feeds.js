@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
             Item: requestJSON
           })
           .promise();
-        body = `Put feed ${requestJSON.pk}`;
+        body = `Put feed test ${requestJSON.pk}`;
         break;
       default:
         throw new Error(`Unsupported route: "${event.routeKey}"`);
